@@ -3,12 +3,23 @@ Read Heart rate value from BLE device.
 A tool sends heart‑rate data from a BLE device to an OSC server.
 
 ## Overview
-This application reads heart‑rate data from a BLE device and sends the data to an OSC server.(e.g. VRChat)
-* The BLE device must implement the **Heart Rate Service** (e.g. COOSPO HW807/HW9, IGPSPORT HR70, etc.).
-* The data sent consists of:
-  * Heart‑rate in **Hz** (beats per second).
-  * A value normalized to the range **0–1** based on a user‑specified minimum and maximum heart‑rate.
-* When the application starts, it automatically reconnects to the BLE device that was connected during the previous session.
+This application reads heart‑rate data from a BLE device and sends the data to an OSC server (e.g. VRChat).
+The BLE device must implement the **Heart Rate Service** (e.g. COOSPO HW807/HW9, IGPSPORT HR70, etc.).
+
+After selecting a BLE heart-rate monitor device, the app retrieves the heart-rate data and sends the following values via OSC:
+* One-quarter of the beats-per-minute value (intended for use in VRChat, where various parameter limitations make it more practical to send a reduced value)
+* A normalized value (0–1) calculated from the specified minimum and maximum heart rates
+
+With this, you can achieve effects such as (in VRChat, for example):
+* Flashing accessories in sync with your heart rate
+* Changing accessory colors depending on heart-rate increases or decreases
+
+## How to use
+* Start scanning for BLE devices and select your heart-rate monitor from the list.
+The app will automatically search for and connect to the heart-rate service.
+* Adjust the OSC parameter name and target IP/port as needed.
+
+When the application starts, it automatically reconnects to the BLE device that was connected during the previous session.
 
 # Credits / Third-Party Assets
 This project uses the following third-party libraries and assets:
