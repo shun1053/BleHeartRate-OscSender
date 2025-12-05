@@ -5,9 +5,10 @@ using UnityEngine;
 [Serializable]
 public class AppSettings
 {
-    public string DeviceID;
-    public float MinValue;
-    public float MaxValue;
+    public string DeviceID = string.Empty;
+    public string DeviceName = string.Empty;
+    public float MinValue = 40f;
+    public float MaxValue = 140f;
 }
 
 public static class AppSettingsManager
@@ -25,12 +26,7 @@ public static class AppSettingsManager
     {
         if (!File.Exists(FilePath))
         {
-            settings = new AppSettings
-            {
-                DeviceID = "",
-                MinValue = 0f,
-                MaxValue = 1f
-            };
+            settings = new AppSettings();
             return false;
         }
 
@@ -42,14 +38,32 @@ public static class AppSettingsManager
         catch
         {
             // Create empty settings if JSON parsing failed
-            settings = new AppSettings
-            {
-                DeviceID = "",
-                MinValue = 0f,
-                MaxValue = 1f
-            };
+            settings = new AppSettings();
             return false;
         }
         return true;
+    }
+
+    public static void SaveDeviceInfo(string deviceID, string deviceName)
+    {
+        // Load or create and overwrite device settings
+        Load(out AppSettings settings);
+        settings.DeviceID = deviceID;
+        settings.DeviceName = deviceName;
+        Save(settings);
+    }
+    public static void SaveMinValue(float minValue)
+    {
+        // Load or create and overwrite device settings
+        Load(out AppSettings settings);
+        settings.MinValue = minValue;
+        Save(settings);
+    }
+    public static void SaveMaxValue(float maxValue)
+    {
+        // Load or create and overwrite device settings
+        Load(out AppSettings settings);
+        settings.MaxValue = maxValue;
+        Save(settings);
     }
 }

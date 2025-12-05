@@ -59,11 +59,21 @@ public class HeartRateGraphController : MonoBehaviour
         UpdateNormalized();
         UpdateGraph();
     }
+    public void SetHeartrateMinWithSave(float min)
+    {
+        AppSettingsManager.SaveMinValue(min);
+        SetHeartrateMin(min);
+    }
     public void SetHeartrateMin(float min)
     {
         minValue = min;
         UpdateNormalized();
         UpdateGraph();
+    }
+    public void SetHeartrateMaxWithSave(float max)
+    {
+        AppSettingsManager.SaveMaxValue(max);
+        SetHeartrateMax(max);
     }
     public void SetHeartrateMax(float max)
     {

@@ -93,6 +93,25 @@ public class NumInputController : MonoBehaviour
             onValueChanged.Invoke(currentValue);
         }
     }
+    public void SetValue(float setValue)
+    {
+        currentValue = setValue;
+        if (limitMin && limitMinValue > currentValue)
+        {
+            limitMinValue = currentValue;
+        }
+        if (limitMax && limitMaxValue < currentValue)
+        {
+            limitMaxValue = currentValue;
+        }
+
+        if (inputField != null)
+        {
+            inputField.text = currentValue.ToString();
+            inputField.onEndEdit.Invoke(inputField.text);
+        }
+        onValueChanged.Invoke(currentValue);
+    }
 
     public void SetMaxValue(float maxValue)
     {

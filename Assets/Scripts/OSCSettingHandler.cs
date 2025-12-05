@@ -10,9 +10,10 @@ public class OSCSettingHandler : MonoBehaviour
     public TMP_InputField ipAddressInputField;
     public TMP_InputField portInputField;
     [Space]
+    public float heartRateDivisor = 4f;
     public HeartRateObserver heartRateObserver;
-    public TMP_InputField heartRateHzSendTargetInputField;
-    public OSCValueSender heartRateHzOscValueSender;
+    public TMP_InputField heartRateSendTargetInputField;
+    public OSCValueSender heartRateOscValueSender;
     [Space]
     public HeartRateGraphController heartRateGraphController;
     public TMP_InputField normalizedHeartRateSendTargetInputField;
@@ -42,21 +43,21 @@ public class OSCSettingHandler : MonoBehaviour
             portInputField.text = TargetPort.ToString();
             portInputField.onEndEdit.AddListener(ApplyPort);
         }
-        if (heartRateHzSendTargetInputField != null && heartRateHzOscValueSender != null)
+        if (heartRateSendTargetInputField != null && heartRateOscValueSender != null)
         {
-            heartRateHzSendTargetInputField.text = heartRateHzOscValueSender.valueSendTarget;
-            heartRateHzSendTargetInputField.onEndEdit.AddListener(ApplyHeartRateHzSendTarget);
+            heartRateSendTargetInputField.text = heartRateOscValueSender.valueSendTarget;
+            heartRateSendTargetInputField.onEndEdit.AddListener(ApplyHeartRateSendTarget);
         }
         if (normalizedHeartRateSendTargetInputField != null && normalizedHeartRateOscValueSender != null)
         {
             normalizedHeartRateSendTargetInputField.text = normalizedHeartRateOscValueSender.valueSendTarget;
             normalizedHeartRateSendTargetInputField.onEndEdit.AddListener(ApplyNormalizedHeartRateSendTarget);
         }
-        if (heartRateObserver != null && heartRateHzOscValueSender != null)
+        if (heartRateObserver != null && heartRateOscValueSender != null)
         {
             heartRateObserver.onHeartRateReceivedHz.AddListener((float hr_hz) =>
             {
-                heartRateHzOscValueSender.SendValue(hr_hz);
+                heartRateOscValueSender.SendValueDivided(hr_hz, heartRateDivisor);
             });
         }
         if (heartRateGraphController != null && normalizedHeartRateOscValueSender != null)
@@ -96,11 +97,11 @@ public class OSCSettingHandler : MonoBehaviour
         }
     }
 
-    public void ApplyHeartRateHzSendTarget(string sendTarget)
+    public void ApplyHeartRateSendTarget(string sendTarget)
     {
-        if (heartRateHzOscValueSender != null)
+        if (heartRateOscValueSender != null)
         {
-            heartRateHzOscValueSender.valueSendTarget = sendTarget;
+            heartRateOscValueSender.valueSendTarget = sendTarget;
         }
     }
 

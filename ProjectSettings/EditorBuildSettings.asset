@@ -4,8 +4,5 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes:
-  - enabled: 0
-    path: Assets/Demo/OSCSendSample.unity
-    guid: 1a10ca35dd53480429daba5bbf7ac535
+  m_Scenes: []
   m_configObjects: {}

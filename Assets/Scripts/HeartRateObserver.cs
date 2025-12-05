@@ -13,12 +13,9 @@ public class HeartRateObserver : MonoBehaviour
     private bool isDataReceived = false;
     [Space]
     public TMP_Text deviceScanButtonText;
-    public TMP_Text deviceScanStatusText;
     [Space]
     public TMP_Text selectedDeviceNameText;
     public TMP_Text selectedDeviceIDText;
-    public TMP_Text serviceScanStatusText;
-    public TMP_Text characteristicScanStatusText;
     public TMP_Text errorText;
     [Header("Device, Service, Characteristic IDs")]
     public string selectedDeviceId;
@@ -89,6 +86,7 @@ public class HeartRateObserver : MonoBehaviour
             onDeviceClear.AddListener(deviceButtonManager.ClearAll);
             onDeviceDiscovered.AddListener(deviceButtonManager.HandleDeviceDiscovered);
             onDeviceNameChanged.AddListener(deviceButtonManager.HandleDeviceNameChanged);
+            onDeviceNameChanged.AddListener(UpdateDeviceName);
             onDeviceDeviceConnectableChanged.AddListener(deviceButtonManager.HandleDeviceConnectableChanged);
             // Add listener for selection
             deviceButtonManager.onDeviceSelected.AddListener(SelectDevice);
@@ -107,7 +105,10 @@ public class HeartRateObserver : MonoBehaviour
         if (lastError != errorMessage.msg)
         {
             Debug.LogError(errorMessage.msg);
-            errorText.text = errorMessage.msg;
+            if (errorText != null)
+            {
+                errorText.text = errorMessage.msg;
+            }
             lastError = errorMessage.msg;
         }
 
@@ -148,7 +149,6 @@ public class HeartRateObserver : MonoBehaviour
         }
         
         deviceScanButtonText.text = "Start scan";
-        deviceScanStatusText.text = "stopped";
         
         isScanningDevices = false;
         isScanningServices = false;
@@ -232,7 +232,6 @@ public class HeartRateObserver : MonoBehaviour
         BleApi.StartDeviceScan();
         isScanningDevices = true;
         deviceScanButtonText.text = "Stop scan";
-        deviceScanStatusText.text = "scanning";
         if (deviceScanRoutine == null)
         {
             deviceScanRoutine = StartCoroutine(DeviceScanCoroutine());
@@ -245,7 +244,6 @@ public class HeartRateObserver : MonoBehaviour
         isScanningDevices = false;
         BleApi.StopDeviceScan();
         deviceScanButtonText.text = "Start scan";
-        deviceScanStatusText.text = "stopped";
         if (deviceScanRoutine != null)
         {
             StopCoroutine(deviceScanRoutine);
@@ -285,7 +283,6 @@ public class HeartRateObserver : MonoBehaviour
                     // Auto reconnect if the scanned device matches the previously selected device
                     if (!string.IsNullOrEmpty(selectedDeviceId) && res.id == selectedDeviceId && res.isConnectable)
                     {
-                        print ($"Device {selectedDeviceId} found during reconnection scan. Initiating service scan.");
                         reconnectAttempts = 0;
                         // Stop device scan and start service scan
                         StopDeviceScan();
@@ -297,7 +294,6 @@ public class HeartRateObserver : MonoBehaviour
                 {
                     isScanningDevices = false;
                     deviceScanButtonText.text = "Start scan";
-                    deviceScanStatusText.text = "finished";
                     deviceScanRoutine = null;
                     yield break;
                 }
@@ -310,6 +306,7 @@ public class HeartRateObserver : MonoBehaviour
         deviceScanRoutine = null;
     }
 
+    // Works with found in device scan
     public void SelectDevice(string selectedId, string selectedName)
     {
         onDeviceSelected.Invoke();
@@ -324,6 +321,34 @@ public class HeartRateObserver : MonoBehaviour
         StartServiceScan();
     }
 
+    // Reconnect to a previously selected device (needs to Re-Scan)
+    public void ReconnectDevice(string deviceID, string deviceName)
+    {
+        if (string.IsNullOrEmpty(deviceID))
+        {
+            return;
+        }
+        onDeviceSelected.Invoke();
+        // Remove all buttons
+        deviceButtonManager.ClearAll();
+        // Set selected device info
+        selectedDeviceNameText.text = deviceName;
+        selectedDeviceIDText.text = deviceID;
+        // Start reconnection
+        selectedDeviceId = deviceID;
+        reconnectAttempts = 0;
+        StopDeviceScan();
+        StartDeviceScan();
+    }
+
+    public void UpdateDeviceName(string id, string name)
+    {
+        if (!string.IsNullOrEmpty(selectedDeviceId) && id == selectedDeviceId)
+        {
+            selectedDeviceNameText.text = name;
+        }
+    }
+
     public void StartServiceScan()
     {
         if (!isScanningServices)
@@ -332,7 +357,6 @@ public class HeartRateObserver : MonoBehaviour
             // start new scan
             BleApi.ScanServices(selectedDeviceId);
             isScanningServices = true;
-            serviceScanStatusText.text = "scanning";
             if (serviceScanRoutine == null)
             {
                 serviceScanRoutine = StartCoroutine(ServiceScanCoroutine());
@@ -354,7 +378,6 @@ public class HeartRateObserver : MonoBehaviour
                 else if (status == BleApi.ScanStatus.FINISHED)
                 {
                     isScanningServices = false;
-                    serviceScanStatusText.text = "finished";
                     serviceScanRoutine = null;
                     OnServiceScanComplete();
                     yield break;
@@ -393,7 +416,6 @@ public class HeartRateObserver : MonoBehaviour
             characteristics.Clear();
             BleApi.ScanCharacteristics(selectedDeviceId, selectedServiceId);
             isScanningCharacteristics = true;
-            characteristicScanStatusText.text = "scanning";
             if (characteristicScanRoutine == null)
             {
                 characteristicScanRoutine = StartCoroutine(CharacteristicScanCoroutine());
@@ -415,7 +437,6 @@ public class HeartRateObserver : MonoBehaviour
                 else if (status == BleApi.ScanStatus.FINISHED)
                 {
                     isScanningCharacteristics = false;
-                    characteristicScanStatusText.text = "finished";
                     characteristicScanRoutine = null;
                     OnCharacteristicScanComplete();
                     yield break;
@@ -455,6 +476,9 @@ public class HeartRateObserver : MonoBehaviour
             StopCoroutine(heartRatePollingRoutine);
             heartRatePollingRoutine = null;
         }
+        // Save device info when subscribing(successful connection)
+        AppSettingsManager.SaveDeviceInfo(selectedDeviceId, selectedDeviceNameText.text);
+        // Start polling subscription
         BleApi.SubscribeCharacteristic(selectedDeviceId, selectedServiceId, selectedCharacteristicId, false);
         isSubscribed = true;
         onSubscribed.Invoke();

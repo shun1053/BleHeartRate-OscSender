@@ -4,16 +4,14 @@ using UnityEngine;
 using UnityEngine.UI;
 using uOSC;
 
-[RequireComponent(typeof(uOscClient))]
 public class OSCValueSender : MonoBehaviour
 {
-    private uOscClient oscClient;
+    [SerializeField]private uOscClient oscClient;
     [Space]
     public string valueSendTarget = "/avatar/parameters/name";
     
     void Start()
     {
-        oscClient = GetComponent<uOscClient>();
         if (oscClient == null)
         {
             enabled = false;
@@ -26,5 +24,22 @@ public class OSCValueSender : MonoBehaviour
         {
             oscClient.Send(valueSendTarget, sendValue);
         }
+    }
+    public void SendValueDivided(float sendValue, float divisor)
+    {
+        if (oscClient == null)
+        {
+            Debug.LogWarning("OSC client is not assigned.");
+            return;
+        }
+
+        if (Mathf.Approximately(divisor, 0f))
+        {
+            Debug.LogWarning("Divisor is zero. Send aborted to avoid division by zero.");
+            return;
+        }
+
+        float valueToSend = sendValue / divisor;
+        oscClient.Send(valueSendTarget, valueToSend);
     }
 }

@@ -1114,6 +1114,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2284615461177674205, guid: 514b162861425264e8c72af891afa023, type: 3}
+      propertyPath: m_fontSize
+      value: 16
+      objectReference: {fileID: 0}
+    - target: {fileID: 2284615461177674205, guid: 514b162861425264e8c72af891afa023, type: 3}
       propertyPath: m_fontColor32.rgba
       value: 2161563350
       objectReference: {fileID: 0}
@@ -1151,7 +1155,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3703039292111965375, guid: 514b162861425264e8c72af891afa023, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 30
+      value: 40
       objectReference: {fileID: 0}
     - target: {fileID: 3703039292111965375, guid: 514b162861425264e8c72af891afa023, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1206,6 +1210,10 @@ PrefabInstance:
       value: "40\u200B"
       objectReference: {fileID: 0}
     - target: {fileID: 5246053827305564499, guid: 514b162861425264e8c72af891afa023, type: 3}
+      propertyPath: m_fontSize
+      value: 16
+      objectReference: {fileID: 0}
+    - target: {fileID: 5246053827305564499, guid: 514b162861425264e8c72af891afa023, type: 3}
       propertyPath: m_fontColor32.rgba
       value: 4292269782
       objectReference: {fileID: 0}
@@ -1255,7 +1263,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7724220355840225767, guid: 514b162861425264e8c72af891afa023, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 70
+      value: 90
       objectReference: {fileID: 0}
     - target: {fileID: 7724220355840225767, guid: 514b162861425264e8c72af891afa023, type: 3}
       propertyPath: m_SizeDelta.y
@@ -1275,15 +1283,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8644919943178627178, guid: 514b162861425264e8c72af891afa023, type: 3}
       propertyPath: m_ContentType
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 8644919943178627178, guid: 514b162861425264e8c72af891afa023, type: 3}
-      propertyPath: m_KeyboardType
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 8644919943178627178, guid: 514b162861425264e8c72af891afa023, type: 3}
+      propertyPath: m_KeyboardType
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8644919943178627178, guid: 514b162861425264e8c72af891afa023, type: 3}
       propertyPath: m_CharacterValidation
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 8644919943178627178, guid: 514b162861425264e8c72af891afa023, type: 3}
       propertyPath: m_OnEndEdit.m_PersistentCalls.m_Calls.Array.size
