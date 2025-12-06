@@ -16,8 +16,10 @@ With this, you can achieve effects such as (in VRChat, for example):
 
 ## How to use
 * Start scanning for BLE devices and select your heart-rate monitor from the list.
+![Device Select Screenshot](DeviceSelect.png)
 The app will automatically search for and connect to the heart-rate service.
 * Adjust the OSC parameter name and target IP/port as needed.
+![App Sample Screenshot](AppSample.png)
 
 When the application starts, it automatically reconnects to the BLE device that was connected during the previous session.
 
