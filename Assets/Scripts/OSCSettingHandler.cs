@@ -18,6 +18,8 @@ public class OSCSettingHandler : MonoBehaviour
     public HeartRateGraphController heartRateGraphController;
     public TMP_InputField normalizedHeartRateSendTargetInputField;
     public OSCValueSender normalizedHeartRateOscValueSender;
+    [Space]
+    public AppSettingsHandler appSettingsHandler;
 
     public string TargetIPAddress
     {
@@ -33,24 +35,41 @@ public class OSCSettingHandler : MonoBehaviour
 
     void Start()
     {
+        if (appSettingsHandler != null)
+        {
+            appSettingsHandler.onLastQuarterHRSendTargetLoaded.AddListener(ApplyHeartRateSendTarget);
+            appSettingsHandler.onLastNormalizedValueSendTargetLoaded.AddListener(ApplyNormalizedHeartRateSendTarget);
+            appSettingsHandler.onLastSendTargetIPLoaded.AddListener(ApplyIPAddress);
+            appSettingsHandler.onLastSendTargetPortLoaded.AddListener(ApplyPort);
+        }
+        else
+        {
+            if (heartRateOscValueSender != null)
+            {
+                ApplyHeartRateSendTarget(heartRateOscValueSender.valueSendTarget);
+            }
+            if (normalizedHeartRateOscValueSender != null)
+            {
+                ApplyNormalizedHeartRateSendTarget(normalizedHeartRateOscValueSender.valueSendTarget);
+            }
+            ApplyIPAddress(TargetIPAddress);
+            ApplyPort(TargetPort);
+        }
+
         if (ipAddressInputField != null)
         {
-            ipAddressInputField.text = TargetIPAddress;
             ipAddressInputField.onEndEdit.AddListener(ApplyIPAddress);
         }
         if (portInputField != null)
         {
-            portInputField.text = TargetPort.ToString();
             portInputField.onEndEdit.AddListener(ApplyPort);
         }
-        if (heartRateSendTargetInputField != null && heartRateOscValueSender != null)
+        if (heartRateSendTargetInputField != null)
         {
-            heartRateSendTargetInputField.text = heartRateOscValueSender.valueSendTarget;
             heartRateSendTargetInputField.onEndEdit.AddListener(ApplyHeartRateSendTarget);
         }
-        if (normalizedHeartRateSendTargetInputField != null && normalizedHeartRateOscValueSender != null)
+        if (normalizedHeartRateSendTargetInputField != null)
         {
-            normalizedHeartRateSendTargetInputField.text = normalizedHeartRateOscValueSender.valueSendTarget;
             normalizedHeartRateSendTargetInputField.onEndEdit.AddListener(ApplyNormalizedHeartRateSendTarget);
         }
         if (heartRateObserver != null && heartRateOscValueSender != null)
@@ -75,26 +94,37 @@ public class OSCSettingHandler : MonoBehaviour
         {
             oscClient.address = parsedIp.ToString();
         }
-        else
+        if (ipAddressInputField != null)
         {
-            if (ipAddressInputField != null)
-            {
-                ipAddressInputField.text = oscClient.address;
-            }
+            ipAddressInputField.text = oscClient.address;
         }
+        AppSettingsManager.SaveSendTargetIP(oscClient.address);
     }
 
     public void ApplyPort(string portText)
     {
-        if (int.TryParse(portText, out int port) && (port >= 0 && port <= 65535))
+        if (int.TryParse(portText, out int port))
         {
-            oscClient.port = port;
+            ApplyPort(port);
+        }
+        else
+        {
+            portInputField.text = oscClient.port.ToString();
+        }
+        AppSettingsManager.SaveSendTargetPort(oscClient.port);
+    }
+    public void ApplyPort(int portInt)
+    {
+        if (portInt >= 0 && portInt <= 65535)
+        {
+            oscClient.port = portInt;
             return;
         }
         if (portInputField != null)
         {
             portInputField.text = oscClient.port.ToString();
         }
+        AppSettingsManager.SaveSendTargetPort(oscClient.port);
     }
 
     public void ApplyHeartRateSendTarget(string sendTarget)
@@ -103,6 +133,11 @@ public class OSCSettingHandler : MonoBehaviour
         {
             heartRateOscValueSender.valueSendTarget = sendTarget;
         }
+        if (heartRateSendTargetInputField != null)
+        {
+            heartRateSendTargetInputField.text = sendTarget;
+        }
+        AppSettingsManager.SaveQuarterHRSendTarget(sendTarget);
     }
 
     public void ApplyNormalizedHeartRateSendTarget(string sendTarget)
@@ -111,5 +146,10 @@ public class OSCSettingHandler : MonoBehaviour
         {
             normalizedHeartRateOscValueSender.valueSendTarget = sendTarget;
         }
+        if (normalizedHeartRateSendTargetInputField != null)
+        {
+            normalizedHeartRateSendTargetInputField.text = sendTarget;
+        }
+        AppSettingsManager.SaveNormalizedValueSendTarget(sendTarget);
     }
 }

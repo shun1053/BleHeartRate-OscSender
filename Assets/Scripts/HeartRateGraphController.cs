@@ -81,6 +81,22 @@ public class HeartRateGraphController : MonoBehaviour
         UpdateNormalized();
         UpdateGraph();
     }
+    public void SaveQuarterHRSendTarget(string target)
+    {
+        AppSettingsManager.SaveQuarterHRSendTarget(target);
+    }
+    public void SaveNormalizedValueSendTarget(string target)
+    {
+        AppSettingsManager.SaveNormalizedValueSendTarget(target);
+    }
+    public void SaveSendTargetIP(string ip)
+    {
+        AppSettingsManager.SaveSendTargetIP(ip);
+    }
+    public void SaveSendTargetPort(int port)
+    {
+        AppSettingsManager.SaveSendTargetPort(port);
+    }
 
     // Compute normalized value and invoke event
     void UpdateNormalized()

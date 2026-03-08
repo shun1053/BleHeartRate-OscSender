@@ -3669,6 +3669,7 @@ MonoBehaviour:
   heartRateGraphController: {fileID: 233068420}
   normalizedHeartRateSendTargetInputField: {fileID: 790191947}
   normalizedHeartRateOscValueSender: {fileID: 1047133625}
+  appSettingsHandler: {fileID: 301449369}
 --- !u!1 &875475663
 GameObject:
   m_ObjectHideFlags: 0

@@ -9,6 +9,10 @@ public class AppSettings
     public string DeviceName = string.Empty;
     public float MinValue = 40f;
     public float MaxValue = 140f;
+    public string QuarterHRSendTarget = string.Empty;
+    public string NormalizedValueSendTarget = string.Empty;
+    public string SendTargetIP = "127.0.0.1";
+    public int SendTargetPort = 0;
 }
 
 public static class AppSettingsManager
@@ -64,6 +68,30 @@ public static class AppSettingsManager
         // Load or create and overwrite device settings
         Load(out AppSettings settings);
         settings.MaxValue = maxValue;
+        Save(settings);
+    }
+    public static void SaveQuarterHRSendTarget(string quarterHRTarget)
+    {
+        Load(out AppSettings settings);
+        settings.QuarterHRSendTarget = quarterHRTarget;
+        Save(settings);
+    }
+    public static void SaveNormalizedValueSendTarget(string normalizedValueTarget)
+    {
+        Load(out AppSettings settings);
+        settings.NormalizedValueSendTarget = normalizedValueTarget;
+        Save(settings);
+    }
+    public static void SaveSendTargetIP(string ip)
+    {
+        Load(out AppSettings settings);
+        settings.SendTargetIP = ip;
+        Save(settings);
+    }
+    public static void SaveSendTargetPort(int port)
+    {
+        Load(out AppSettings settings);
+        settings.SendTargetPort = port;
         Save(settings);
     }
 }

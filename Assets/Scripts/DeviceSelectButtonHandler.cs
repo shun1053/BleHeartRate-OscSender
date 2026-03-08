@@ -56,7 +56,12 @@ public class DeviceSelectButtonHandler : MonoBehaviour
     }
     public void SetShowState(bool showState)
     {
-        gameObject.SetActive(showState);
+        // ToDo: isConnectable may switch rapidly in some environment, so further investigation is needed.
+        // gameObject.SetActive(showState);
+        if (button != null)
+        {
+            button.interactable = showState;
+        }
     }
 
     public void OnButtonClicked()
