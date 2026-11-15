@@ -23,6 +23,20 @@ public class BleDeviceButtonManager : MonoBehaviour
 
     private readonly Dictionary<string, DeviceInfo> _devices = new Dictionary<string, DeviceInfo>();
     private readonly Dictionary<string, DeviceSelectButtonHandler> _buttonHandlers = new Dictionary<string, DeviceSelectButtonHandler>();
+    private bool selectionEnabled = true;
+
+    public void SetSelectionEnabled(bool enabled)
+    {
+        if (selectionEnabled == enabled) return;
+        selectionEnabled = enabled;
+        foreach (var handler in _buttonHandlers.Values) handler.SetShowState(enabled);
+    }
+
+    public void SetDeviceVisible(string deviceId, bool visible)
+    {
+        if (_buttonHandlers.TryGetValue(deviceId, out DeviceSelectButtonHandler handler) && handler.gameObject.activeSelf != visible)
+            handler.gameObject.SetActive(visible);
+    }
 
     // Set all info when a device is discovered
     public void HandleDeviceDiscovered(string deviceId, string deviceName, bool isConnectable)
@@ -61,13 +75,14 @@ public class BleDeviceButtonManager : MonoBehaviour
         if (string.IsNullOrEmpty(deviceId)) return;
         if (!_devices.TryGetValue(deviceId, out DeviceInfo deviceInfo))
         {
-            _devices[deviceId] = new DeviceInfo("", false);
+            _devices[deviceId] = new DeviceInfo("", isConnectable);
         }
         else
         {
             deviceInfo.isConnectable = isConnectable;
         }
-        UpdateButton(deviceId);
+        // Windows reports transient advertising state here, not whether a connection will succeed.
+        // Keep the row and its button stable; only an explicit connection operation disables selection.
     }
 
     // Clear all devices and buttons(e.g., when restarting a scan)
@@ -88,13 +103,13 @@ public class BleDeviceButtonManager : MonoBehaviour
     {
         if (!_devices.TryGetValue(deviceId, out DeviceInfo info)) return;
 
-        bool showState = !string.IsNullOrEmpty(info.name) && info.isConnectable;
+        bool showState = selectionEnabled;
         if (_buttonHandlers.TryGetValue(deviceId, out DeviceSelectButtonHandler buttonHandler))
         {
             buttonHandler.SetDeviceInfo(deviceId, info.name);
             buttonHandler.SetShowState(showState);
         }
-        else if (buttonHandler == null && showState)
+        else if (buttonHandler == null)
         {
             // Create new button if it doesn't exist and should be shown
             if (deviceButtonPrefab == null)
@@ -123,4 +138,3 @@ public class BleDeviceButtonManager : MonoBehaviour
         }
     }
 }
-

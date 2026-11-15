@@ -4,6 +4,8 @@ using UnityEngine.UI;
 [AddComponentMenu("UI/UV Image (TwoTexture)")]
 public class Image_TwoTexMul : Image
 {
+    private static readonly int MainTexUVId = Shader.PropertyToID("_MainTexUV");
+    private static readonly int AlphaTexUVId = Shader.PropertyToID("_AlphaTexUV");
     [SerializeField]
     private Vector4 _mainTexUV = new Vector4(1, 1, 0, 0);
     [SerializeField]
@@ -65,14 +67,15 @@ public class Image_TwoTexMul : Image
 
     protected override void OnDidApplyAnimationProperties()
     {
-        SetMaterialDirty();
+        // Graphic.SetAllDirty calls our SetMaterialDirty override already.
         base.OnDidApplyAnimationProperties();
     }
 
     void ApplyUV()
     {
-        if (materialForRendering == null) return;
-        materialForRendering.SetVector("_MainTexUV", MainTexUV);
-        materialForRendering.SetVector("_AlphaTexUV", AlphaTexUV);
+        Material targetMaterial = materialForRendering;
+        if (targetMaterial == null) return;
+        if (targetMaterial.HasProperty(MainTexUVId)) targetMaterial.SetVector(MainTexUVId, MainTexUV);
+        if (targetMaterial.HasProperty(AlphaTexUVId)) targetMaterial.SetVector(AlphaTexUVId, AlphaTexUV);
     }
 }

@@ -42,30 +42,29 @@ public class DeviceSelectButtonHandler : MonoBehaviour
     public void SetDeviceInfo(string deviceId, string deviceName)
     {
         DeviceId = deviceId;
-        DeviceName = deviceName;
+        DeviceName = string.IsNullOrEmpty(deviceName) ? "Unnamed device" : deviceName;
 
         if (deviceNameText != null)
         {
-            deviceNameText.text = deviceName ?? string.Empty;
+            if (deviceNameText.text != DeviceName) deviceNameText.text = DeviceName;
         }
 
         if (deviceIdText != null)
         {
-            deviceIdText.text = deviceId ?? string.Empty;
+            if (deviceIdText.text != (deviceId ?? string.Empty)) deviceIdText.text = deviceId ?? string.Empty;
         }
     }
     public void SetShowState(bool showState)
     {
-        // ToDo: isConnectable may switch rapidly in some environment, so further investigation is needed.
-        // gameObject.SetActive(showState);
         if (button != null)
         {
-            button.interactable = showState;
+            if (button.interactable != showState) button.interactable = showState;
         }
     }
 
     public void OnButtonClicked()
     {
+        if (button != null && !button.interactable) return;
         onDeviceSelected.Invoke(DeviceId, DeviceName);
     }
 }

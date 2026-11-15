@@ -34,10 +34,10 @@ public class AppSettingsHandler : MonoBehaviour
         yield return null;
         if (AppSettingsManager.Load(out AppSettings settings))
         {
+            SwitchUI(!string.IsNullOrEmpty(settings.DeviceID));
             if (!string.IsNullOrEmpty(settings.DeviceID))
             {
                 onLastDeviceLoaded.Invoke(settings.DeviceID, settings.DeviceName);
-                SwitchUI(true);
             }
 
             if (!string.IsNullOrEmpty(settings.QuarterHRSendTarget))
@@ -82,6 +82,16 @@ public class AppSettingsHandler : MonoBehaviour
         }
         onLastSettingMinLoaded.Invoke(settings.MinValue);
         onLastSettingMaxLoaded.Invoke(settings.MaxValue);
+    }
+
+    public void ShowDeviceList()
+    {
+        SwitchUI(false);
+    }
+
+    public void ShowConnectionView()
+    {
+        SwitchUI(true);
     }
 
     void SwitchUI(bool isDeviceSelected)

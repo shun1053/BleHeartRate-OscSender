@@ -1,0 +1,3 @@
+[submodule "Native~/BleWinrtDll"]
+	path = Native~/BleWinrtDll
+	url = https://github.com/shun1053/BleWinrtDll.git

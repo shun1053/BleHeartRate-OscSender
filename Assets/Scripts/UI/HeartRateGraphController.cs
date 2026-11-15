@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -17,7 +15,7 @@ public class HeartRateGraphController : MonoBehaviour
     [SerializeField]private float maxValue;
     [Space]
     public float normalizedValue;
-    public UnityEvent<float> onNormalizedValueChanged;
+    public UnityEvent<float> onNormalizedValueChanged = new UnityEvent<float>();
     [Space]
     public RectTransform graphLowLineRectTransform;
     public RectTransform graphHighLineRectTransform;
@@ -26,12 +24,19 @@ public class HeartRateGraphController : MonoBehaviour
     public RectTransform currentValueTextRectTransform;
 
 
+    void OnEnable()
+    {
+        UpdateAnimationState();
+    }
+
+    void OnDisable()
+    {
+        if (heartrateAnimator != null) heartrateAnimator.enabled = false;
+    }
+
     void Start()
     {
-        SetActiveAll(graphOnObjects, false);
-        SetActiveAll(graphOffObjects, true);
         UpdateHeartRate(0f);
-        UpdateGraph();
     }
 
     public void UpdateHeartRate(float heartrateHz)
@@ -50,14 +55,19 @@ public class HeartRateGraphController : MonoBehaviour
             SetActiveAll(graphOffObjects, true);
         }
 
-        // Update animator
-        if (heartrateAnimator != null && heartrateAnimator.isActiveAndEnabled)
-        {
-            heartrateAnimator.SetFloat(heartrateAnimatorParam, currentHeartRate);
-        }
-
+        UpdateAnimationState();
         UpdateNormalized();
         UpdateGraph();
+    }
+
+    private void UpdateAnimationState()
+    {
+        if (heartrateAnimator == null) return;
+        // Keep the heartbeat animation running when another application has focus.
+        bool shouldAnimate = isActiveAndEnabled && currentHeartRate > 0f;
+        if (heartrateAnimator.enabled != shouldAnimate) heartrateAnimator.enabled = shouldAnimate;
+        if (shouldAnimate && heartrateAnimator.gameObject.activeInHierarchy)
+            heartrateAnimator.SetFloat(heartrateAnimatorParam, currentHeartRate);
     }
     public void SetHeartrateMinWithSave(float min)
     {
@@ -124,43 +134,35 @@ public class HeartRateGraphController : MonoBehaviour
     // Update graph visual based on min/max values
     void UpdateGraph()
     {
-        if (maxValue == 0f)
-        {
-            // Avoid division by zero
-            maxValue += float.Epsilon;
-        }
+        // Do not mutate the normalization settings merely to draw a zero-range graph.
+        float graphMaximum = maxValue == 0f ? float.Epsilon : maxValue;
 
         if (graphLowLineRectTransform != null)
         {
-            float anchorMaxX = Mathf.Clamp01((minValue / maxValue) * highLineStartOffset);
-            graphLowLineRectTransform.anchorMin = new Vector2(0f, 0f);
-            graphLowLineRectTransform.anchorMax = new Vector2(anchorMaxX, 0f);
+            float anchorMaxX = Mathf.Clamp01((minValue / graphMaximum) * highLineStartOffset);
+            SetAnchors(graphLowLineRectTransform, Vector2.zero, new Vector2(anchorMaxX, 0f));
         }
         if (graphHighLineRectTransform != null)
         {
             float anchorMinX = highLineStartOffset;
-            graphHighLineRectTransform.anchorMin = new Vector2(anchorMinX, 1f);
-            graphHighLineRectTransform.anchorMax = new Vector2(1f, 1f);
+            SetAnchors(graphHighLineRectTransform, new Vector2(anchorMinX, 1f), Vector2.one);
         }
 
         // Update current heart rate lines
-        float anchorPosX = Mathf.Clamp01((currentHeartRate / maxValue) * highLineStartOffset);
+        float anchorPosX = Mathf.Clamp01((currentHeartRate / graphMaximum) * highLineStartOffset);
         float anchorPosY = normalizedValue;
         Vector2 anchorMin;
         if (currentVerticalLineRectTransform != null)
         {
             anchorMin = currentVerticalLineRectTransform.anchorMin;
             anchorMin.x = anchorPosX;
-            currentVerticalLineRectTransform.anchorMin = anchorMin;
-            
-            currentVerticalLineRectTransform.anchorMax = new Vector2(anchorPosX, anchorPosY);
+            SetAnchors(currentVerticalLineRectTransform, anchorMin, new Vector2(anchorPosX, anchorPosY));
         }
         if (currentHorizontalLineRectTransform != null)
         {
             anchorMin = currentHorizontalLineRectTransform.anchorMin;
             anchorMin.y = anchorPosY;
-            currentHorizontalLineRectTransform.anchorMin = anchorMin;
-            currentHorizontalLineRectTransform.anchorMax = new Vector2(anchorPosX, anchorPosY);
+            SetAnchors(currentHorizontalLineRectTransform, anchorMin, new Vector2(anchorPosX, anchorPosY));
         }
 
         if (currentValueTextRectTransform != null)
@@ -178,15 +180,22 @@ public class HeartRateGraphController : MonoBehaviour
             {
                 pivot.y = 0.5f;
             }
-            currentValueTextRectTransform.pivot = pivot;
+            if (currentValueTextRectTransform.pivot != pivot) currentValueTextRectTransform.pivot = pivot;
         }
+    }
+
+    private static void SetAnchors(RectTransform target, Vector2 minimum, Vector2 maximum)
+    {
+        if (target.anchorMin != minimum) target.anchorMin = minimum;
+        if (target.anchorMax != maximum) target.anchorMax = maximum;
     }
 
     void SetActiveAll(GameObject[] gameObjects, bool active)
     {
+        if (gameObjects == null) return;
         foreach (GameObject obj in gameObjects)
         {
-            if (obj != null)
+            if (obj != null && obj.activeSelf != active)
             {
                 obj.SetActive(active);
             }
