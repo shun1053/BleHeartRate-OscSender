@@ -3976,7 +3976,7 @@ MonoBehaviour:
   portInputField: {fileID: 900679081}
   heartRateDivisor: 4
   heartRateObserver: {fileID: 1923770360}
-  heartRateSendTargetInputField: {fileID: 790191947}
+  heartRateSendTargetInputField: {fileID: 1214031249}
   heartRateOscValueSender: {fileID: 155789463}
   heartRateGraphController: {fileID: 233068420}
   normalizedHeartRateSendTargetInputField: {fileID: 790191947}
@@ -5460,6 +5460,17 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 514b162861425264e8c72af891afa023, type: 3}
+--- !u!114 &1214031249 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8644919943178627178, guid: 514b162861425264e8c72af891afa023, type: 3}
+  m_PrefabInstance: {fileID: 1214031248}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2da0c512f12947e489f739169773d7ca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!224 &1214031250 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3703039292111965375, guid: 514b162861425264e8c72af891afa023, type: 3}
